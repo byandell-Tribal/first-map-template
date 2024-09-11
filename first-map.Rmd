@@ -1,0 +1,82 @@
+---
+title: "Earth Analytics First Map"
+author: "Brian Yandell"
+date: "2024-09-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is translated from
+[first-map.ipynb](https://github.com/byandell-Tribal/first-map-template/blob/main/first-map.ipynb) using
+<https://www.codeconvert.ai/python-to-r-converter>.
+
+Some hopefully helpful docs:
+
+- [osmdata Vignette](https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html)
+- [Mapping with Open Street Maps in R](https://jcoliver.github.io/learn-r/017-open-street-map.html)
+- [Open Street Map data (RSpatialData)](https://rspatialdata.github.io/osm.html)
+- <https://mapsplatform.google.com/>
+  - [ggmap::register_google](https://rdrr.io/cran/ggmap/man/register_google.html)
+  - [Get API Key](https://developers.google.com/maps/documentation/maps-static/get-api-key/)
+  - [Securing an API Key](https://cloud.google.com/docs/authentication/api-keys#securing_an_api_key)
+  - [usage and billing](https://developers.google.com/maps/documentation/maps-static/usage-and-billing/)
+  - [UW Guidelines on Google Maps API Key](https://wiscweb.wisc.edu/2018/11/30/events-calendar-embedded-map-display-changes/)
+
+```{r eval=FALSE}
+# Load necessary libraries
+library(sf)
+library(ggplot2)
+library(osmdata)
+```
+
+```{r}
+# Search for locations by name - this might take a moment
+osm_gdf <- osmdata::opq("UW-Madison") |>
+  osmdata::add_osm_feature(key = "amenity", value = "university") |>
+  osmdata::osmdata_sf()
+osm_gdf
+```
+
+Plot the outline of UW-Madison.
+This does not automatically overlay on a map.
+                          
+```{r}
+# Plot OSM boundary
+osm_map <- ggplot2::ggplot() +
+  # OSM points
+  ggplot2::geom_sf(data = osm_gdf$osm_points, 
+          fill = "white", 
+          alpha = 0.2, 
+          color = "skyblue", 
+          size = 1) +
+  # OSM multipolygons (there are no polygons)
+  ggplot2::geom_sf(data = osm_gdf$osm_multipolygons, 
+          fill = "white", 
+          alpha = 0.2, 
+          color = "skyblue", 
+          size = 2) +
+  ggplot2::ggtitle("UW-Madison") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+  ggplot2::coord_sf()
+
+# Display the map
+print(osm_map)
+```
+
+```{r eval=FALSE}
+# Save the map as a file to put on the web (not quite right)
+ggplot2::ggsave("osm.html", plot = osm_map, device = "html")
+```
+
+## Overlay data on map
+
+This requires a google map key (see links above) with CC.
+
+```{r eval=FALSE}
+#ggmap::register_google()
+wisc_map <- ggmap::get_map(osmdata::getbb("UW-Madison"), maptype = "roadmap")
+```
