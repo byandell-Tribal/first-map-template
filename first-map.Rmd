@@ -52,15 +52,15 @@ osm_map <- ggplot2::ggplot() +
                                  progress = "none") +
   # OSM points
   ggplot2::geom_sf(data = osm_gdf$osm_points, 
-          fill = "white", 
+          fill = "transparent", 
           alpha = 0.2, 
-          color = "skyblue", 
+          color = "red", 
           size = 1) +
   # OSM multipolygons (there are no polygons)
   ggplot2::geom_sf(data = osm_gdf$osm_multipolygons, 
-          fill = "white", 
+          fill = "transparent", 
           alpha = 0.2, 
-          color = "skyblue", 
+          color = "red", 
           size = 2) +
   ggplot2::ggtitle("UW-Madison") +
   ggplot2::theme_minimal() +
