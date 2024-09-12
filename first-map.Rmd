@@ -10,20 +10,24 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 This is translated from
-[first-map.ipynb](https://github.com/byandell-Tribal/first-map-template/blob/main/first-map.ipynb) using
-<https://www.codeconvert.ai/python-to-r-converter>.
+[first-map.ipynb](https://github.com/byandell-Tribal/first-map-template/blob/main/first-map.ipynb).
+I first used
+<https://www.codeconvert.ai/python-to-r-converter>,
+which only got partway there.
+Then I used 
+[MS CoPilot](https://copilot.microsoft.com/)
+(via UW-Madison license).
 
-Some hopefully helpful docs:
+The 
+[OpenStreetMap (OSM)](https://www.openstreetmap.org/)
+data is accessed via `osmdata`. 
+Static maps are plotted using `ggplot2` with `sf` bridging
+with `geom_sf` for polygon and point layers.
+OSM base map layer is added with 
+`annotation_map_tile` from `ggspatial` package.
+Interactive maps can be produces with package `tmap`.
 
-- [osmdata Vignette](https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html)
-- [Mapping with Open Street Maps in R](https://jcoliver.github.io/learn-r/017-open-street-map.html)
-- [Open Street Map data (RSpatialData)](https://rspatialdata.github.io/osm.html)
-- <https://mapsplatform.google.com/>
-  - [ggmap::register_google](https://rdrr.io/cran/ggmap/man/register_google.html)
-  - [Get API Key](https://developers.google.com/maps/documentation/maps-static/get-api-key/)
-  - [Securing an API Key](https://cloud.google.com/docs/authentication/api-keys#securing_an_api_key)
-  - [usage and billing](https://developers.google.com/maps/documentation/maps-static/usage-and-billing/)
-  - [UW Guidelines on Google Maps API Key](https://wiscweb.wisc.edu/2018/11/30/events-calendar-embedded-map-display-changes/)
+Interactive map
 
 ```{r eval=FALSE}
 # Load necessary libraries
