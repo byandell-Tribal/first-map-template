@@ -31,6 +31,7 @@ library(sf)
 library(ggplot2)
 library(osmdata)
 library(ggspatial)
+library(tmap)
 ```
 
 ```{r}
@@ -47,7 +48,7 @@ This does not automatically overlay on a map.
 ```{r}
 # Plot OSM boundary
 osm_map <- ggplot2::ggplot() +
-  # Base map
+  # Base map from OpenStreetMap
   ggspatial::annotation_map_tile(type = "osm", zoom = 14,
                                  progress = "none") +
   # OSM points
@@ -76,11 +77,13 @@ print(osm_map)
 ggplot2::ggsave("osm.html", plot = osm_map, device = "html")
 ```
 
-## Overlay data on map
+Interactive plot using 
+[tmap](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html).
+However, it does not display outline color properly.
 
-This requires a google map key (see links above) with CC.
-
-```{r eval=FALSE}
-#ggmap::register_google()
-wisc_map <- ggmap::get_map(osmdata::getbb("UW-Madison"), maptype = "roadmap")
+```{r}
+tmap::tmap_mode("view")
+tmap::tm_shape(osm_data$osm_multipolygons) +
+  tmap::tm_basemap("OpenStreetMap") +
+  tmap::tm_borders(col = "red", lwd = 10)
 ```
