@@ -30,6 +30,7 @@ Some hopefully helpful docs:
 library(sf)
 library(ggplot2)
 library(osmdata)
+library(ggspatial)
 ```
 
 ```{r}
@@ -46,6 +47,9 @@ This does not automatically overlay on a map.
 ```{r}
 # Plot OSM boundary
 osm_map <- ggplot2::ggplot() +
+  # Base map
+  ggspatial::annotation_map_tile(type = "osm", zoom = 14,
+                                 progress = "none") +
   # OSM points
   ggplot2::geom_sf(data = osm_gdf$osm_points, 
           fill = "white", 
