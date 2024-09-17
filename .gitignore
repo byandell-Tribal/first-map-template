@@ -161,3 +161,6 @@ cython_debug/
 #.idea/
 .Rproj.user
 *.Rproj
+.Rhistory
+*.html
+*.cache

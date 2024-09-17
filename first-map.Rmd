@@ -89,8 +89,11 @@ Display seems to require an intermediate step of `sf::st_make_valid()` to render
 intmd <- sf::st_make_valid(osm_gdf$osm_multipolygons)
 ```
 
-```{r}
+```{r warning=FALSE}
 tmap::tmap_mode("view")
+```
+
+```{r}
 tmap::tm_shape(intmd) +
   tmap::tm_basemap("OpenStreetMap") +
   tmap::tm_borders(col = "red", lwd = 2)
