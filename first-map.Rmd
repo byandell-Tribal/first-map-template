@@ -83,11 +83,15 @@ ggplot2::ggsave("osm.html", plot = osm_map, device = "html")
 
 Interactive plot using 
 [tmap](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html).
-However, it does not display outline color properly.
+Display seems to require an intermediate step of `sf::st_make_valid()` to render properly.
+
+```{r}
+intmd <- sf::st_make_valid(osm_gdf$osm_multipolygons)
+```
 
 ```{r}
 tmap::tmap_mode("view")
-tmap::tm_shape(osm_data$osm_multipolygons) +
+tmap::tm_shape(intmd) +
   tmap::tm_basemap("OpenStreetMap") +
-  tmap::tm_borders(col = "red", lwd = 10)
+  tmap::tm_borders(col = "red", lwd = 2)
 ```
