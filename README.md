@@ -1,11 +1,23 @@
 # First Map Template Repository
 
-A template repository for getting started with map-making in GitHub Codespaces.
+This is a fork of
+<https://github.com/cu-esiil-edu/first-map-template/>.
+It includes Python code to develop a `first map` of
+a campus of my choice
+(UW-Madison).
+It also includes 
+[first-map.Rmd](https://github.com/byandell-Tribal/first-map-template/blob/main/first-map.Rmd),
+R markdown code to do the same thing in R,
+producing static and dynamic
+([tmap](https://github.com/r-tmap/tmap))
+maps.
 
-To use:
+There is also a rudimentary Shiny app `osmApp()` in
+[first-map.R](https://github.com/byandell-Tribal/first-map-template/blob/main/first-map.R).
+This currently only allows the option of UW-Madison
+and produces a static map.
 
-  1. Click on `Use this Template` in the upper right, and select `Open in Codespace`. This might take a minute if you haven't done it in awhile.
-  2. Once the Codespace loads, open `first-map.ipynb`
-  3. Complete the activity
-  4. Find your map in the left-hand file explorer, click on the `...` and download your map.
-  5. [Stop your Codespace](https://docs.github.com/en/codespaces/developing-in-a-codespace/stopping-and-starting-a-codespace#stopping-a-codespace) so you don't use up your allocation!
+A beginning (and partially broken) idea on
+[osm_Col.Rmd](https://github.com/byandell-Tribal/first-map-template/blob/main/osm_Col.Rmd)
+investigates how to work directly with OSM data.
+

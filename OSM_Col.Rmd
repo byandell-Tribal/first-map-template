@@ -1,0 +1,131 @@
+---
+title: "Query OSM"
+author: "Brian Yandell"
+date: "2024-09-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Use R to query OpenStreetMap data for colleges and universities in the US
+using the Overpass API.
+Query times out if we try the whole country, but works for a state.
+Campuses are either in `osm_polygons` or `osm_multipolygons` and have full names
+in column `name` and possible shorter names in `alt_name`, `alt_name_1` and
+`alt_name_2`.
+Probably rely on `alt_name` and combine polygons and multipolygons list
+for selected state.
+
+Next thing to do is try to find TCUs.
+Need to use another list to locate them.
+
+```{r eval=FALSE}
+install.packages("httr")
+install.packages("jsonlite")
+library(httr)
+library(jsonlite)
+```
+
+Define the Overpass API query:
+
+```{r}
+query <- osmdata::opq(bbox = "Wisconsin") |>
+  osmdata::add_osm_feature(key = "amenity", value = c("university", "college"))
+```
+
+```{r}
+osm_data <- osmdata::osmdata_sf(query)
+```
+
+```{r}
+polys <- osm_data$osm_polygons |>
+  dplyr::select(-geometry) |>
+  tibble::as_tibble() |>
+  dplyr::select(alt_name, alt_name_1, alt_name_2, name) |>
+  tidyr::pivot_longer(dplyr::everything(),
+                      names_to = "source", values_to = "name") |>
+  dplyr::filter(!is.na(name), name != "")
+```
+
+```{r}
+multis <- osm_data$osm_multipolygons |>
+  dplyr::select(-geometry) |>
+  tibble::as_tibble() |>
+  dplyr::select(alt_name, alt_name_1, alt_name_2, name) |>
+  tidyr::pivot_longer(dplyr::everything(),
+                      names_to = "source", values_to = "name") |>
+  dplyr::filter(!is.na(name), name != "")
+```
+
+```{r}
+m <- match(polys$name, multis$name)
+mm <- match(multis$name, polys$name)
+polys$name[!is.na(m)]
+multis$name[!is.na(mm)]
+```
+```{r}
+sum(multis$source == "alt_name")
+sum(polys$source == "alt_name")
+```
+
+```{r}
+polys |> dplyr::filter(grepl("Menominee", name))
+```
+
+```{r}
+dplyr::filter(osm_data$osm_polygons, grepl("Menominee", name)) |>
+  dplyr::select(name, operator)
+```
+
+
+```{r}
+query <- '
+[out:json][timeout:25];
+area["name"="California"][admin_level=2];
+(
+  node"amenity"="university";
+  way"amenity"="university";
+  relation"amenity"="university";
+  node"amenity"="college";
+  way"amenity"="college";
+  relation"amenity"="college";
+);
+out body;
+>;
+out skel qt;
+'
+```
+
+Send the query to the Overpass API:
+
+```{r}
+response <- httr::POST(
+  url = "http://overpass-api.de/api/interpreter",
+  body = list(data = query),
+  encode = "form"
+)
+```
+
+Parse the response:
+
+```{r}
+data <- jsonlite::fromJSON(httr::content(response, "text", encoding = "UTF-8"))
+```
+
+# Extract nodes, ways, and relations
+
+```{r}
+nodes <- data$elements[data$elements$type == "node", ]
+ways <- data$elements[data$elements$type == "way", ]
+relations <- data$elements[data$elements$type == "relation", ]
+```
+
+View the first few entries
+
+```{r}
+head(nodes)
+head(ways)
+head(relations)
+```
