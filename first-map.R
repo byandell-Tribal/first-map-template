@@ -14,7 +14,7 @@ osmServer <- function(id) {
     
     # Goal here is to set up shiny app with user selection
     # of college or university
-
+    
     # Search for locations by name - this might take a moment
     osm_gdf <- shiny::reactive({
       shiny::req(input$campus)
@@ -22,13 +22,13 @@ osmServer <- function(id) {
         osmdata::add_osm_feature(key = "amenity", value = "university") |>
         osmdata::osmdata_sf()
     })
-
+    
     # Plot OSM boundary
     output$static_plot <- shiny::renderPlot({
-      shiny::req(input$campus, osm_gdf())
+      shiny::req(input$campus, osm_gdf(), input$osm_zoom)
       ggplot2::ggplot() +
         # Base map from OpenStreetMap
-        ggspatial::annotation_map_tile(type = "osm", zoom = 14,
+        ggspatial::annotation_map_tile(type = "osm", zoomin = input$osm_zoom,
                                        progress = "none") +
         # OSM points
         ggplot2::geom_sf(data = osm_gdf()$osm_points, 
@@ -72,11 +72,12 @@ osmInput <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny::textInput(inputId = ns("campus"),
-                label = "Campus Name:",
-                value = "UW-Madison"),
+                     label = "Campus Name:",
+                     value = "UW-Madison"),
     shiny::checkboxInput(inputId = ns("static"),
-                  label = shiny::strong("Static Plot?"),
-                  value = TRUE))
+                         label = shiny::strong("Static Plot?"),
+                         value = TRUE),
+    shiny::sliderInput(ns("osm_zoom"), "Zoom:", -2, 1, -1, 1))
 }
 #' Shiny Module UI for osm
 #' @param id identifier for shiny reactive
@@ -96,7 +97,7 @@ osmOutput <- function(id) {
   ns <- shiny::NS(id)
   shiny::plotOutput(ns("static_plot"), height = "300px")
 }
-  
+
 #' Shiny Module App for OSM
 #' @return nothing returned
 #' @rdname osm
@@ -105,7 +106,7 @@ osmApp <- function() {
   ui <- shiny::bootstrapPage(
     osmInput("osm"), 
     osmOutput("osm")#,
-#    osmUI("osm")
+    #    osmUI("osm")
   )
   server <- function(input, output, session) {
     osmServer("osm")
